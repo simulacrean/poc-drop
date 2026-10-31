@@ -1,0 +1,167 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Are We Having Fun Yet?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tilt+Neon&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: one failing neon sign hanging in a dead, rain-soaked lot at night. The sign is the only light. */
+:root{
+  --omen:#9dff4a; --omen-core:#eaffd6;
+  --night:#05040a; --wall:#0c0a12; --neon:#ff2b3f; --neon-core:#ffd9dc; --dead:#3a1418; --rain:#9aa3c0; --fg:#b9b3c4;
+  --sign:"Tilt Neon","Arial Narrow",sans-serif; --body:Calibri,Carlito,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--fg);font-family:var(--body);font-size:11pt;overflow:hidden}
+.stage{--mx:0;--my:0;position:relative;height:100%;display:grid;place-items:center;overflow:hidden;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));background:var(--night)}
+.layer{position:absolute;inset:-8%;pointer-events:none;will-change:transform}
+.bg{background:radial-gradient(ellipse 70% 55% at 50% 42%, color-mix(in srgb,var(--neon) 14%,var(--wall)) 0%, var(--wall) 45%, var(--night) 100%);transform:translate3d(calc(var(--mx)*-10px),calc(var(--my)*-6px),0)}
+.skyline{top:auto;height:52%;transform:translate3d(calc(var(--mx)*-22px),calc(var(--my)*-10px),0)}
+.poles{transform:translate3d(calc(var(--mx)*-48px),calc(var(--my)*-20px),0)}
+.skyline svg,.poles svg{width:100%;height:100%;display:block}
+.sil{fill:#08070c} .sil2{fill:#040306} .win{fill:var(--neon);opacity:.18} .wire{stroke:#050407;stroke-width:3;fill:none}
+.stage.omen .win{fill:var(--omen)}
+canvas{position:absolute;inset:-8%;width:116%;height:116%;pointer-events:none;transform:translate3d(calc(var(--mx)*-70px),calc(var(--my)*-30px),0)}
+.signwrap{position:relative;z-index:2;transform:translate3d(calc(var(--mx)*14px),calc(var(--my)*8px),0)}
+.glowwash{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 55% 40% at 50% 42%, color-mix(in srgb,var(--neon) 22%,transparent), transparent 70%);mix-blend-mode:screen;animation:wash 7s infinite steps(1)}
+.sign{position:relative;z-index:2;text-align:center;animation:sway 9s ease-in-out infinite;transform-origin:50% -40vh}
+.chains{position:absolute;left:0;right:0;top:-60vh;height:60vh;pointer-events:none}
+.chains i{position:absolute;bottom:0;width:2px;height:100%;background:linear-gradient(#000,#1d1a22);}
+.chains i:first-child{left:14%} .chains i:last-child{right:14%}
+.board{position:relative;border:2px solid #1c1720;border-radius:6px;padding:clamp(18px,4vw,42px) clamp(18px,5vw,64px);
+  background:linear-gradient(#0b090e,#08070b);box-shadow:0 30px 80px rgba(0,0,0,.8), inset 0 0 40px rgba(0,0,0,.9)}
+h1{margin:0;font-family:var(--sign);font-weight:400;line-height:1.05;font-size:clamp(40px,9vw,128px);letter-spacing:.02em;text-wrap:balance}
+h1 .w{display:inline-block;white-space:nowrap}
+h1 span.l{color:var(--neon-core);text-shadow:0 0 4px #fff,0 0 10px var(--neon),0 0 22px var(--neon),0 0 48px var(--neon),0 0 90px var(--neon);
+  animation:flick var(--d,5s) infinite steps(1);animation-delay:var(--o,0s)}
+h1 span.dying{animation:dying 3.7s infinite steps(1)}
+h1 span.dead{color:var(--dead);text-shadow:none;animation:corpse 11s infinite steps(1)}
+.tube{margin-top:clamp(10px,2vw,22px);font-family:var(--sign);font-size:clamp(14px,2.4vw,26px);letter-spacing:.5em;color:var(--dead);text-transform:uppercase}
+.tube b{font-weight:400;color:var(--neon-core);text-shadow:0 0 6px var(--neon),0 0 18px var(--neon);animation:dying 6.1s infinite steps(1) .8s}
+.hum{position:absolute;z-index:3;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  background:transparent;color:var(--fg);border:1px solid #2a2430;border-radius:999px;padding:8px 14px;font:inherit;font-size:10pt;letter-spacing:.08em;cursor:pointer;opacity:.6}
+.hum:hover,.hum:focus-visible{opacity:1;outline:1px solid var(--neon);outline-offset:2px}
+.caption{position:absolute;z-index:3;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));font-size:9.5pt;opacity:.35;letter-spacing:.04em}
+h1.omen span.l{color:var(--dead)!important;text-shadow:none!important;animation:none!important;opacity:1}
+h1.omen span.l.hunt{color:var(--omen-core)!important;text-shadow:0 0 4px #fff,0 0 12px var(--omen),0 0 28px var(--omen),0 0 60px var(--omen),0 0 110px var(--omen)!important;animation:omenbuzz 2.8s steps(1) 1!important}
+.stage.omen .glowwash{background:radial-gradient(ellipse 55% 40% at 50% 42%, color-mix(in srgb,var(--omen) 20%,transparent), transparent 70%);animation:none}
+.stage.omen .tube b{color:var(--dead);text-shadow:none;animation:none}
+@keyframes omenbuzz{0%{opacity:0}8%{opacity:1}11%{opacity:.2}14%{opacity:1}70%{opacity:1}72%{opacity:.3}74%{opacity:1}100%{opacity:1}}
+@keyframes flick{0%,100%{opacity:1}41%{opacity:1}42%{opacity:.25}43%{opacity:1}44%{opacity:.4}45%{opacity:1}87%{opacity:1}88%{opacity:.15}89%{opacity:1}}
+@keyframes dying{0%{opacity:1}6%{opacity:.1}8%{opacity:1}10%{opacity:.08}22%{opacity:.08}23%{opacity:.9}24%{opacity:.08}55%{opacity:.08}56%{opacity:1}70%{opacity:1}71%{opacity:.2}72%{opacity:1}}
+@keyframes corpse{0%,92%{color:var(--dead);text-shadow:none}93%{color:var(--neon-core);text-shadow:0 0 10px var(--neon),0 0 40px var(--neon)}94%{color:var(--dead);text-shadow:none}96%{color:var(--neon-core);text-shadow:0 0 10px var(--neon),0 0 40px var(--neon)}97%{color:var(--dead);text-shadow:none}}
+@keyframes wash{0%,100%{opacity:1}42%{opacity:.5}43%{opacity:1}88%{opacity:.3}89%{opacity:1}}
+@keyframes sway{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+@media (prefers-reduced-motion:reduce){h1 span.l,h1 span.dying,h1 span.dead,.tube b,.glowwash,.sign{animation:none}}
+</style>
+
+<div class="stage" id="stage">
+  <div class="layer bg" aria-hidden="true"></div>
+  <div class="layer skyline" aria-hidden="true"><svg viewBox="0 0 1600 400" preserveAspectRatio="xMidYMax slice">
+    <path class="sil" d="M0 400V250h90v-60h70v40h60V160h110v70h40v-40h80v110h70V140h40v-30h60v30h40v110h90v-70h100v-50h60v50h50v120h80V200h110v50h60v-90h90v240h70V230h90v170Z"/>
+    <rect class="win" x="260" y="180" width="8" height="12"/><rect class="win" x="300" y="205" width="8" height="12"/><rect class="win" x="590" y="170" width="8" height="12"/><rect class="win" x="930" y="150" width="8" height="12"/><rect class="win" x="1270" y="220" width="8" height="12"/><rect class="win" x="1440" y="190" width="8" height="12"/>
+  </svg></div>
+  <div class="layer poles" aria-hidden="true"><svg viewBox="0 0 1600 900" preserveAspectRatio="xMidYMax slice">
+    <path class="wire" d="M-20 330 Q 250 400 230 340 Q 800 470 1400 300 Q 1520 360 1640 330"/><path class="wire" d="M-20 360 Q 240 430 230 370 Q 800 500 1400 330 Q 1520 390 1640 360"/>
+    <rect class="sil2" x="222" y="300" width="16" height="600"/><rect class="sil2" x="180" y="330" width="100" height="8"/>
+    <rect class="sil2" x="1392" y="260" width="18" height="640"/><rect class="sil2" x="1345" y="295" width="110" height="8"/>
+    <path class="sil2" d="M0 900V820h1600v80Z"/>
+  </svg></div>
+  <canvas id="rain" aria-hidden="true"></canvas>
+  <div class="glowwash" aria-hidden="true"></div>
+  <div class="signwrap">
+  <div class="sign">
+    <div class="chains" aria-hidden="true"><i></i><i></i></div>
+    <div class="board">
+      <h1 id="msg" aria-label="Are we having fun yet?"></h1>
+      <div class="tube" aria-hidden="true">no <b>exit</b></div>
+    </div>
+  </div>
+  </div>
+  <button class="hum" id="hum" type="button" aria-pressed="false">Turn on the hum</button>
+  <div class="caption">The lot closed years ago. The sign never got the message.</div>
+</div>
+
+<script>
+(function(){
+  // Build the sign letter by letter so each tube fails on its own schedule.
+  var words=["Are","we","having","fun","yet?"], h=document.getElementById("msg");
+  var seed=7; function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647;}
+  words.forEach(function(w,wi){
+    var ws=document.createElement("span"); ws.className="w"; ws.setAttribute("aria-hidden","true");
+    w.split("").forEach(function(ch,ci){
+      var s=document.createElement("span"); s.textContent=ch; s.className="l";
+      if(w==="fun"&&ci===0) s.className+=" dead";
+      else if(w==="having"&&ci===4) s.className+=" dying";
+      else if(w==="yet?"&&ch==="?") s.className+=" dying";
+      s.style.setProperty("--d",(3+rnd()*6).toFixed(2)+"s");
+      s.style.setProperty("--o",(-rnd()*6).toFixed(2)+"s");
+      ws.appendChild(s);
+    });
+    h.appendChild(ws);
+    if(wi<words.length-1) h.appendChild(document.createTextNode(" "));
+  });
+
+  // Every so often the sign goes dark and only a hidden word comes back, in another color.
+  // Each word is found in the sign's own letters, left to right.
+  var stage=document.querySelector(".stage"), omen=false, letters=[].slice.call(h.querySelectorAll("span.l"));
+  var omens=["we hunt","we haunt","run","haunt"], last=-1;
+  function light(phrase){
+    letters.forEach(function(s){s.classList.remove("hunt");});
+    var want=phrase.replace(/ /g,"").toLowerCase(), k=0;
+    letters.forEach(function(s){ if(k<want.length&&!s.classList.contains("dead")&&s.textContent.toLowerCase()===want[k]){s.classList.add("hunt");k++;} });
+  }
+  function omenNext(){ setTimeout(function(){
+    var i; do{i=Math.floor(Math.random()*omens.length);}while(i===last&&omens.length>1); last=i;
+    light(omens[i]);
+    h.classList.add("omen"); stage.classList.add("omen"); omen=true; h.setAttribute("aria-label",omens[i].charAt(0).toUpperCase()+omens[i].slice(1));
+    setTimeout(function(){ h.classList.remove("omen"); stage.classList.remove("omen"); omen=false; h.setAttribute("aria-label","Are we having fun yet?"); omenNext(); }, 2800);
+  }, 9000+Math.random()*9000); }
+  omenNext();
+
+  // Parallax: the far wall barely moves, the skyline a little, the poles and rain more, and the sign leans toward you.
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(!reduce){
+    var tx=0,ty=0,cx=0,cy=0;
+    window.addEventListener("pointermove",function(e){tx=(e.clientX/window.innerWidth-0.5)*2;ty=(e.clientY/window.innerHeight-0.5)*2;});
+    document.addEventListener("pointerleave",function(){tx=0;ty=0;});
+    (function ease(){cx+=(tx-cx)*0.06;cy+=(ty-cy)*0.06;stage.style.setProperty("--mx",cx.toFixed(4));stage.style.setProperty("--my",cy.toFixed(4));requestAnimationFrame(ease);})();
+  }
+
+  // Rain, lit red where it passes in front of the sign.
+
+  var c=document.getElementById("rain"), x=c.getContext("2d"), drops=[], W=0, H=0;
+  var still=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){var r=window.devicePixelRatio||1;W=c.clientWidth;H=c.clientHeight;c.width=W*r;c.height=H*r;x.setTransform(r,0,0,r,0,0);
+    drops=[];var n=Math.round(W*H/4500);for(var i=0;i<n;i++)drops.push({x:Math.random()*W,y:Math.random()*H,l:8+Math.random()*18,v:6+Math.random()*9});}
+  function frame(){
+    x.clearRect(0,0,W,H);
+    for(var i=0;i<drops.length;i++){var d=drops[i];
+      var near=Math.max(0,1-Math.hypot((d.x-W/2)/(W*.45),(d.y-H*.42)/(H*.35)));
+      x.strokeStyle=near>0.05?(omen?"rgba(157,255,74,":"rgba(255,70,90,")+(0.12+near*0.45).toFixed(3)+")":"rgba(154,163,192,0.14)";
+      x.lineWidth=1;x.beginPath();x.moveTo(d.x,d.y);x.lineTo(d.x-1.5,d.y+d.l);x.stroke();
+      if(!still){d.y+=d.v;d.x-=0.25;if(d.y>H){d.y=-20;d.x=Math.random()*W;}}
+    }
+    requestAnimationFrame(frame);
+  }
+  window.addEventListener("resize",size); size(); frame();
+
+  // The hum: a mains buzz with a crackle, only after the viewer asks for it.
+  var btn=document.getElementById("hum"), ctx=null, master=null;
+  btn.addEventListener("click",function(){
+    if(!ctx){
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC){btn.textContent="No sound here";return;}
+      ctx=new AC(); master=ctx.createGain(); master.gain.value=0; master.connect(ctx.destination);
+      [60,120,180].forEach(function(f,i){var o=ctx.createOscillator();o.type=i?"sine":"sawtooth";o.frequency.value=f;var g=ctx.createGain();g.gain.value=[0.05,0.03,0.015][i];o.connect(g);g.connect(master);o.start();});
+      setInterval(function(){ if(master&&master.gain.value>0&&Math.random()<0.35){var t=ctx.currentTime;master.gain.setValueAtTime(0.02,t);master.gain.setValueAtTime(0.6,t+0.04+Math.random()*0.08);} },700);
+    }
+    var on=btn.getAttribute("aria-pressed")!=="true";
+    if(ctx.state==="suspended") ctx.resume();
+    master.gain.setTargetAtTime(on?0.6:0,ctx.currentTime,0.15);
+    btn.setAttribute("aria-pressed",String(on)); btn.textContent=on?"Make it stop":"Turn on the hum";
+  });
+  // Opened from the game's collection: the hum starts by itself (and on the first click, if the browser held it back).
+  if(/[?&]autoplay=1/.test(location.search)){ btn.click(); document.addEventListener("pointerdown",function(){ if(ctx&&ctx.state==="suspended") ctx.resume(); },{once:true}); }
+})();
+</script>
+
+</body></html>

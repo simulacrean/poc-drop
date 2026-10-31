@@ -1,0 +1,412 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mind Blown With Peace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee+Shade&family=VT323&family=Carlito:wght@400;700&display=swap">
+<style>
+/* Layout: a public-access VHS clip, full screen. A head on a cheap blue backdrop blows open into a universe of peace, then rewinds and does it again. */
+:root{
+  --tape:#0a0614; --chroma:#1e3cff; --skin:#f2c39b; --glow:#fff6d6; --hud:#e8ffe8; --pink:#ff7ad9;
+  --display:"Bungee Shade","Impact",sans-serif; --vhs:"VT323",ui-monospace,monospace; --body:Calibri,Carlito,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{margin:0;background:var(--tape);color:var(--hud);font-family:var(--body);font-size:11pt;overflow:hidden}
+.screen{position:relative;height:100%;overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+.vign{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+.track{position:absolute;left:0;right:0;height:14px;pointer-events:none;background:linear-gradient(transparent,rgba(255,255,255,.12),transparent);animation:track 6.5s linear infinite}
+.hud{position:absolute;font-family:var(--vhs);font-size:clamp(18px,3vw,30px);letter-spacing:.05em;color:var(--hud);text-shadow:2px 0 rgba(255,0,80,.6),-2px 0 rgba(0,200,255,.6);pointer-events:none}
+.hud.tl{left:max(16px,env(safe-area-inset-left,0px));top:calc(14px + env(safe-area-inset-top,0px))}
+.hud.tr{right:max(16px,env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px))}
+.controls{position:absolute;display:flex;gap:8px;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.controls button{font-family:var(--vhs);font-size:20px;letter-spacing:.06em;color:var(--hud);background:rgba(0,0,0,.45);border:2px solid var(--hud);padding:4px 12px;cursor:pointer}
+.controls button:hover,.controls button:focus-visible{background:var(--pink);color:#000;outline:none}
+@keyframes track{0%{top:-20px}100%{top:110%}}
+@media (prefers-reduced-motion:reduce){.track{animation:none;display:none}}
+</style>
+
+<div class="screen">
+  <canvas id="c" role="img" aria-label="A man's head on a blue backdrop strains, then bursts open into a universe of doves, flowers, hearts and peace signs, and the word PEACE fills the screen."></canvas>
+  <div class="scan"></div><div class="track"></div><div class="vign"></div>
+  <div class="hud tl" id="clock">PLAY ▶ SP 0:00:00</div>
+  <div class="hud tr">CH 3</div>
+  <div class="controls">
+    <button id="again" type="button">◀◀ AGAIN</button>
+    <button id="snd" type="button" aria-pressed="false">SOUND OFF</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var c=document.getElementById("c"), g=c.getContext("2d"), W=0, H=0, DPR=1;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function size(){DPR=Math.min(window.devicePixelRatio||1,2);W=c.clientWidth;H=c.clientHeight;c.width=W*DPR;c.height=H*DPR;g.setTransform(DPR,0,0,DPR,0,0);}
+  window.addEventListener("resize",size); size();
+
+  var LOOP=27, t0=performance.now(), parts=[], stars=[], boomed=false, novaed=false, frags=null, flames=[], fireSnd=false, crunchSnd=false;
+  function nova(sx,sy,R){
+    for(var i=0;i<160;i++){ var a=Math.random()*Math.PI*2, v=(0.4+Math.random())*R*0.16;
+      parts.push({x:sx,y:sy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,k:["peace","heart","star","flower"][i%4],c:PAL[i%PAL.length],s:(0.2+Math.random()*0.5)*R*0.18,r:Math.random()*6,vr:(Math.random()-.5)*0.1,o:Math.random()*Math.PI*2,nova:true}); }
+    if(audio.on) audio.nova();
+  }
+  for(var i=0;i<260;i++) stars.push({a:Math.random()*Math.PI*2,r:Math.pow(Math.random(),.6),s:Math.random()*1.8+.4,arm:i%3});
+  var KINDS=["dove","dove","peace","flower","flower","heart","star","peace"];
+  var PAL=["#ff7ad9","#ffd84a","#7cf0a0","#7ac8ff","#c79bff","#ffffff","#ff9a5c"];
+  function boom(cx,cy,R){
+    parts=[];
+    for(var i=0;i<140;i++){var a=-Math.PI/2+(Math.random()-.5)*Math.PI*1.9, v=(0.25+Math.random())*R*0.09;
+      parts.push({x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v,k:KINDS[i%KINDS.length],c:PAL[i%PAL.length],s:(0.35+Math.random()*0.9)*R*0.18,r:Math.random()*6,vr:(Math.random()-.5)*0.08,o:Math.random()*Math.PI*2});}
+    if(audio.on) audio.ahh();
+  }
+
+  // --- drawing pieces ---
+  function head(cx,cy,R,mood,open,shake){
+    g.save(); g.translate(cx+(Math.random()-.5)*shake,cy+(Math.random()-.5)*shake);
+    // neck + shirt
+    g.fillStyle="#d9a77f"; g.fillRect(-R*.28,R*.75,R*.56,R*.5);
+    g.fillStyle="#6a4fb3"; g.beginPath(); g.moveTo(-R*1.3,R*1.6); g.quadraticCurveTo(0,R*.95,R*1.3,R*1.6); g.lineTo(R*1.3,R*2.4); g.lineTo(-R*1.3,R*2.4); g.fill();
+    // ears
+    g.fillStyle="#eab48a"; g.beginPath(); g.ellipse(-R*.86,R*.05,R*.16,R*.24,0,0,7); g.ellipse(R*.86,R*.05,R*.16,R*.24,0,0,7); g.fill();
+    // skull: clip off the top once open
+    g.save();
+    if(open>0){ g.beginPath(); g.rect(-R*2,-R*0.2+(1-open)*-R*2,R*4,R*4); g.clip(); }
+    g.fillStyle=getComputedStyle(document.documentElement).getPropertyValue("--skin")||"#f2c39b";
+    g.beginPath(); g.ellipse(0,0,R*.85,R,0,0,7); g.fill();
+    // hair
+    if(open<=0){ g.fillStyle="#3b2a1e"; g.beginPath(); g.ellipse(0,-R*.72,R*.78,R*.34,0,Math.PI,0); g.fill(); }
+    g.restore();
+    // glowing rim where the top came off
+    if(open>0){ var y=-R*0.2; var grd=g.createLinearGradient(0,y-R*.6,0,y);
+      grd.addColorStop(0,"rgba(255,246,214,0)"); grd.addColorStop(1,"rgba(255,246,214,.9)");
+      g.fillStyle=grd; g.fillRect(-R*.85,y-R*1.4,R*1.7,R*1.4);
+      g.fillStyle="#ffe9b0"; g.beginPath(); g.ellipse(0,y,R*.84,R*.12,0,0,7); g.fill(); }
+    // face
+    g.strokeStyle="#3a2416"; g.lineWidth=Math.max(2,R*.045); g.lineCap="round";
+    if(mood==="strain"){ // squeezed eyes, gritted mouth
+      g.beginPath(); g.moveTo(-R*.42,R*.12); g.lineTo(-R*.18,R*.18); g.moveTo(R*.42,R*.12); g.lineTo(R*.18,R*.18); g.stroke();
+      g.beginPath(); g.moveTo(-R*.5,-R*.02); g.lineTo(-R*.16,R*.06); g.moveTo(R*.5,-R*.02); g.lineTo(R*.16,R*.06); g.stroke();
+      g.fillStyle="#fff"; g.fillRect(-R*.24,R*.5,R*.48,R*.14); g.strokeRect(-R*.24,R*.5,R*.48,R*.14);
+      g.fillStyle="rgba(255,60,60,.35)"; g.beginPath(); g.ellipse(-R*.5,R*.38,R*.14,R*.08,0,0,7); g.ellipse(R*.5,R*.38,R*.14,R*.08,0,0,7); g.fill();
+    } else if(mood==="wide"){
+      g.fillStyle="#fff"; g.beginPath(); g.arc(-R*.3,R*.14,R*.17,0,7); g.arc(R*.3,R*.14,R*.17,0,7); g.fill(); g.stroke();
+      g.fillStyle="#1a0f08"; g.beginPath(); g.arc(-R*.3,R*.14,R*.05,0,7); g.arc(R*.3,R*.14,R*.05,0,7); g.fill();
+      g.beginPath(); g.ellipse(0,R*.58,R*.12,R*.16,0,0,7); g.fillStyle="#3a1408"; g.fill();
+    } else { // serene
+      g.beginPath(); g.arc(-R*.3,R*.15,R*.13,Math.PI*.15,Math.PI*.85); g.arc(R*.3,R*.15,R*.13,Math.PI*.15,Math.PI*.85); g.stroke();
+      g.beginPath(); g.arc(0,R*.38,R*.28,Math.PI*.2,Math.PI*.8); g.stroke();
+      g.fillStyle="rgba(255,120,170,.35)"; g.beginPath(); g.ellipse(-R*.52,R*.36,R*.13,R*.07,0,0,7); g.ellipse(R*.52,R*.36,R*.13,R*.07,0,0,7); g.fill();
+    }
+    g.restore();
+  }
+  // A cartoon skeleton posed from joint positions (units, y up from the mat), blended between yoga poses.
+  var POSE={
+    mountain:{head:[0,-6.6],chest:[0,-5.3],pelvis:[0,-3.4],lE:[-.5,-6.6],lH:[-.1,-7.6],rE:[.5,-6.6],rH:[.1,-7.6],lK:[-.35,-1.7],lF:[-.35,0],rK:[.35,-1.7],rF:[.35,0]},
+    tree:{head:[0,-6.6],chest:[0,-5.3],pelvis:[0,-3.4],lE:[-.85,-4.6],lH:[-.05,-4.9],rE:[.85,-4.6],rH:[.05,-4.9],lK:[-.25,-1.7],lF:[-.25,0],rK:[1.4,-2.6],rF:[-.1,-2.1]},
+    warrior:{head:[0,-6.0],chest:[0,-4.8],pelvis:[0,-2.9],lE:[-1.4,-4.8],lH:[-2.7,-4.8],rE:[1.4,-4.8],rH:[2.7,-4.8],lK:[-1.5,-1.6],lF:[-1.7,0],rK:[1.1,-1.5],rF:[2.1,0]},
+    dog:{head:[-1.8,-1.4],chest:[-1.0,-2.4],pelvis:[.4,-3.6],lE:[-1.9,-1.2],lH:[-2.6,0],rE:[-1.7,-1.1],rH:[-2.4,0],lK:[1.1,-1.8],lF:[1.7,0],rK:[1.3,-1.8],rF:[1.9,0]}
+  };
+  function skeleton(x0,y0,u,from,to,f,glow,T){
+    var A=POSE[from],B=POSE[to],P={}; for(var k in A) P[k]=[(A[k][0]+(B[k][0]-A[k][0])*f)*u+x0,(A[k][1]+(B[k][1]-A[k][1])*f)*u+y0+Math.sin(T*2)*u*.03];
+    var sh=[[P.chest[0]-u*.55,P.chest[1]],[P.chest[0]+u*.55,P.chest[1]]], hp=[[P.pelvis[0]-u*.35,P.pelvis[1]],[P.pelvis[0]+u*.35,P.pelvis[1]]];
+    g.save(); g.lineCap="round"; g.lineJoin="round";
+    if(glow>0){ g.shadowColor="rgba(160,220,255,"+glow+")"; g.shadowBlur=u*1.5; }
+    function bone(a,b,w){ g.strokeStyle="#3a2f4a"; g.lineWidth=w+u*.12; g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+      g.strokeStyle="#fbf6ea"; g.lineWidth=w; g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+      [a,b].forEach(function(p){ g.fillStyle="#fbf6ea"; g.beginPath(); g.arc(p[0],p[1],w*.75,0,7); g.fill(); }); }
+    var w=u*.22;
+    // spine and ribs
+    bone(P.chest,P.pelvis,w*.8);
+    for(var r=0;r<4;r++){ var q=.18+r*.2, mx=P.chest[0]+(P.pelvis[0]-P.chest[0])*q*.6, my=P.chest[1]+(P.pelvis[1]-P.chest[1])*q*.6, dx=P.pelvis[0]-P.chest[0], dy=P.pelvis[1]-P.chest[1], L=Math.hypot(dx,dy)||1, nx=-dy/L, ny=dx/L, rl=u*(.75-r*.1);
+      bone([mx-nx*rl,my-ny*rl],[mx+nx*rl,my+ny*rl],w*.55); }
+    bone(sh[0],sh[1],w*.7); bone(hp[0],hp[1],w);
+    // limbs
+    bone(sh[0],P.lE,w); bone(P.lE,P.lH,w*.85); bone(sh[1],P.rE,w); bone(P.rE,P.rH,w*.85);
+    bone(hp[0],P.lK,w*1.1); bone(P.lK,P.lF,w); bone(hp[1],P.rK,w*1.1); bone(P.rK,P.rF,w);
+    bone(P.chest,P.head,w*.6);
+    // skull, eyes closed in bliss
+    var hx=P.head[0], hy=P.head[1], s=u*.75;
+    g.fillStyle="#3a2f4a"; g.beginPath(); g.arc(hx,hy,s+u*.07,0,7); g.fill();
+    g.fillStyle="#fbf6ea"; g.beginPath(); g.arc(hx,hy,s,0,7); g.fill(); g.fillRect(hx-s*.5,hy+s*.5,s,s*.45);
+    g.shadowBlur=0; g.strokeStyle="#3a2f4a"; g.lineWidth=u*.09;
+    g.beginPath(); g.arc(hx-s*.38,hy-s*.02,s*.22,Math.PI*.1,Math.PI*.9); g.stroke();
+    g.beginPath(); g.arc(hx+s*.38,hy-s*.02,s*.22,Math.PI*.1,Math.PI*.9); g.stroke();
+    g.fillStyle="#3a2f4a"; g.beginPath(); g.moveTo(hx,hy+s*.22); g.lineTo(hx-s*.1,hy+s*.42); g.lineTo(hx+s*.1,hy+s*.42); g.fill();
+    for(var tt=-2;tt<=2;tt++) g.fillRect(hx+tt*s*.18-s*.02,hy+s*.6,s*.04,s*.3);
+    g.restore();
+  }
+  // The bones crumble into fragments that tumble, then gather into a heart, which catches fire.
+  function heartPt(th){ return [16*Math.pow(Math.sin(th),3), -(13*Math.cos(th)-5*Math.cos(2*th)-2*Math.cos(3*th)-Math.cos(4*th))]; }
+  function makeFrags(x0,y0,u){
+    var A=POSE.mountain, P={}; for(var k in A) P[k]=[A[k][0]*u+x0,A[k][1]*u+y0];
+    var sh=[[P.chest[0]-u*.55,P.chest[1]],[P.chest[0]+u*.55,P.chest[1]]], hp=[[P.pelvis[0]-u*.35,P.pelvis[1]],[P.pelvis[0]+u*.35,P.pelvis[1]]];
+    var segs=[[P.chest,P.pelvis],[sh[0],sh[1]],[hp[0],hp[1]],[sh[0],P.lE],[P.lE,P.lH],[sh[1],P.rE],[P.rE,P.rH],[hp[0],P.lK],[P.lK,P.lF],[hp[1],P.rK],[P.rK,P.rF],[P.chest,P.head]];
+    var out=[], hc=[x0,y0-u*5.2], hs=u*0.3;
+    for(var i=0;i<380;i++){ var sgm=segs[i%segs.length], q=Math.random(), sx=sgm[0][0]+(sgm[1][0]-sgm[0][0])*q, sy=sgm[0][1]+(sgm[1][1]-sgm[0][1])*q;
+      if(i%13===0){ var a=Math.random()*7; sx=P.head[0]+Math.cos(a)*u*.6; sy=P.head[1]+Math.sin(a)*u*.6; }
+      var th=Math.random()*Math.PI*2, k2=Math.sqrt(Math.random()), hpnt=heartPt(th);
+      out.push({x:sx,y:sy,sx:sx,sy:sy,vx:(Math.random()-.5)*u*.08,vy:-Math.random()*u*.05,tx:hc[0]+hpnt[0]*hs*k2,ty:hc[1]+hpnt[1]*hs*k2,s:u*(.08+Math.random()*.14),r:Math.random()*6,d:Math.random()*.5}); }
+    return out;
+  }
+  function crumble(x0,y0,u,t,T){
+    if(!frags){ frags=makeFrags(x0,y0,u); if(audio.on) audio.crumble(); }
+    var ct=t-14.4, fire=Math.max(0,Math.min(1,(t-15.4)/.6));
+    g.save();
+    // a solid heart forms under the fragments as they arrive, then beats
+    var form=Math.max(0,Math.min(1,(ct-1.3)/0.8));
+    if(form>0){ var hc0=[x0,y0-u*5.2], beat=1+Math.max(0,Math.sin(T*7))*0.06*fire;
+      g.save(); g.translate(hc0[0],hc0[1]); g.scale(u*0.3*beat,u*0.3*beat);
+      g.beginPath(); for(var a=0;a<=Math.PI*2+0.01;a+=0.05){ var hp2=heartPt(a); if(a===0) g.moveTo(hp2[0],hp2[1]); else g.lineTo(hp2[0],hp2[1]); } g.closePath();
+      var hg=g.createLinearGradient(0,-12,0,17); hg.addColorStop(0,fire>0?"#ff5a3c":"#ff7aa8"); hg.addColorStop(1,fire>0?"#b3001e":"#e0306a");
+      g.globalAlpha=form; g.fillStyle=hg; g.fill();
+      g.lineWidth=1.2; g.strokeStyle=fire>0?"#ffd27a":"#ffffff"; g.shadowColor=fire>0?"#ff8a00":"#ffffff"; g.shadowBlur=u*1.2; g.stroke();
+      g.restore(); }
+    for(var i=0;i<frags.length;i++){ var p=frags[i];
+      if(ct<0.6){ p.vy+=u*.012; p.x+=p.vx; p.y+=p.vy; if(p.y>y0){ p.y=y0; p.vy*=-0.3; } p.r+=0.1; p.fx=p.x; p.fy=p.y; }
+      else { var k=Math.max(0,Math.min(1,(ct-0.6-p.d)/0.9)); k=k*k*(3-2*k);
+        p.x=p.fx+(p.tx-p.fx)*k+(k<1?Math.sin(k*Math.PI)*u*.8*Math.cos(p.r):0); p.y=p.fy+(p.ty-p.fy)*k-(k<1?Math.sin(k*Math.PI)*u*1.2:0); }
+      var col=fire>0?"hsl("+(40-fire*30+Math.sin(T*9+i)*8)+",100%,"+(85-fire*30)+"%)":"#fbf6ea";
+      g.fillStyle=col; g.save(); g.translate(p.x,p.y); g.rotate(p.r); g.fillRect(-p.s/2,-p.s/3,p.s,p.s*.66); g.restore(); }
+    if(fire>0){
+      if(!fireSnd){ fireSnd=true; if(audio.on) audio.fire(); }
+      // glow behind the heart, then flames licking up from it
+      var hc=[x0,y0-u*5.2], gl=g.createRadialGradient(hc[0],hc[1],0,hc[0],hc[1],u*8);
+      gl.addColorStop(0,"rgba(255,140,40,"+(.45*fire)+")"); gl.addColorStop(1,"rgba(255,80,20,0)"); g.fillStyle=gl; g.fillRect(hc[0]-u*8,hc[1]-u*8,u*16,u*16);
+      for(var n=0;n<6;n++){ var src=frags[Math.floor(Math.random()*frags.length)]; flames.push({x:src.x+(Math.random()-.5)*u*.3,y:src.y,vy:-(u*.04+Math.random()*u*.06),vx:(Math.random()-.5)*u*.02,life:1,s:u*(.25+Math.random()*.35)}); }
+      g.globalCompositeOperation="lighter";
+      for(var j=flames.length-1;j>=0;j--){ var fl=flames[j]; fl.x+=fl.vx+Math.sin(T*12+j)*u*.01; fl.y+=fl.vy; fl.life-=0.025; if(fl.life<=0){ flames.splice(j,1); continue; }
+        var hue=fl.life>0.7?50:fl.life>0.4?28:8, rad=fl.s*(0.4+fl.life);
+        var fg=g.createRadialGradient(fl.x,fl.y,0,fl.x,fl.y,rad); fg.addColorStop(0,"hsla("+hue+",100%,60%,"+(fl.life*.55*fire)+")"); fg.addColorStop(1,"hsla("+hue+",100%,50%,0)");
+        g.fillStyle=fg; g.beginPath(); g.arc(fl.x,fl.y,rad,0,7); g.fill(); }
+    }
+    g.restore();
+  }
+  function peace(s){ g.lineWidth=s*.16; g.beginPath(); g.arc(0,0,s,0,7); g.moveTo(0,-s); g.lineTo(0,s); g.moveTo(0,0); g.lineTo(-s*.7,s*.7); g.moveTo(0,0); g.lineTo(s*.7,s*.7); g.stroke(); }
+  function flower(s,col){ g.fillStyle=col; for(var i=0;i<6;i++){g.save();g.rotate(i*Math.PI/3);g.beginPath();g.ellipse(0,-s*.55,s*.28,s*.5,0,0,7);g.fill();g.restore();} g.fillStyle="#ffd84a"; g.beginPath(); g.arc(0,0,s*.3,0,7); g.fill(); }
+  function heart(s,col){ g.fillStyle=col; g.beginPath(); g.moveTo(0,s*.35); g.bezierCurveTo(-s*1.1,-s*.35,-s*.45,-s*1.05,0,-s*.45); g.bezierCurveTo(s*.45,-s*1.05,s*1.1,-s*.35,0,s*.35); g.fill(); }
+  function star(s,col){ g.fillStyle=col; g.beginPath(); for(var i=0;i<10;i++){var r=i%2?s*.42:s; var a=i*Math.PI/5-Math.PI/2; g.lineTo(Math.cos(a)*r,Math.sin(a)*r);} g.fill(); }
+  function dove(s,flap){ g.fillStyle="#ffffff"; g.beginPath(); g.ellipse(0,0,s*.9,s*.38,0,0,7); g.fill();
+    g.beginPath(); g.arc(s*.75,-s*.22,s*.26,0,7); g.fill();
+    g.fillStyle="#ffb347"; g.beginPath(); g.moveTo(s*1,-s*.24); g.lineTo(s*1.3,-s*.16); g.lineTo(s*1,-s*.1); g.fill();
+    g.fillStyle="#ffffff"; g.beginPath(); g.moveTo(-s*.2,-s*.1); g.lineTo(s*.25,-s*.1); g.lineTo(-s*.4,-s*(0.6+0.7*Math.abs(Math.sin(flap)))); g.fill();
+    g.beginPath(); g.moveTo(-s*.85,0); g.lineTo(-s*1.35,-s*.25); g.lineTo(-s*1.3,s*.2); g.fill();
+    g.fillStyle="#3a7a3a"; g.fillRect(s*1.1,-s*.2,s*.35,s*.06); }
+  function drawPart(p,t){ g.save(); g.translate(p.x,p.y); g.rotate(p.k==="dove"?Math.sin(t*2+p.o)*.15:p.r);
+    g.strokeStyle=p.c; g.globalAlpha=p.a==null?1:p.a;
+    if(p.k==="dove") dove(p.s,t*9+p.o); else if(p.k==="peace") peace(p.s*.6); else if(p.k==="flower") flower(p.s*.6,p.c); else if(p.k==="heart") heart(p.s*.6,p.c); else star(p.s*.55,p.c);
+    g.restore(); }
+  function wordArt(text,x,y,size,t,alpha){
+    g.save(); g.globalAlpha=alpha; g.textAlign="center"; g.textBaseline="middle"; g.font=size+"px "+getComputedStyle(document.documentElement).getPropertyValue("--display");
+    for(var i=0;i<text.length;i++){ var w=g.measureText(text).width, cx=x-w/2+g.measureText(text.slice(0,i)).width+g.measureText(text[i]).width/2;
+      var yy=y+Math.sin(t*4+i*.7)*size*.08;
+      g.fillStyle="rgba(0,0,0,.5)"; g.fillText(text[i],cx+size*.06,yy+size*.06);
+      g.fillStyle="hsl("+((t*90+i*40)%360)+",95%,65%)"; g.fillText(text[i],cx,yy); }
+    g.restore();
+  }
+  function cheap(text,x,y,size,col,alpha){ g.save(); g.globalAlpha=alpha; g.textAlign="center"; g.textBaseline="middle"; g.font=size+"px VT323, monospace";
+    g.fillStyle="rgba(255,0,80,.7)"; g.fillText(text,x+2,y); g.fillStyle="rgba(0,200,255,.7)"; g.fillText(text,x-2,y); g.fillStyle=col; g.fillText(text,x,y); g.restore(); }
+
+  // --- the clip ---
+  var lastLoop=-1;
+  function frame(now){
+    var T=(now-t0)/1000, t=reduce?7.5:T%LOOP, loop=Math.floor(T/LOOP);
+    if(loop!==lastLoop){ lastLoop=loop; boomed=false; novaed=false; parts=[]; frags=null; flames=[]; fireSnd=false; crunchSnd=false; }
+    var cx=W/2, R=Math.min(W,H)*0.17, cy=H*0.62;
+    document.getElementById("clock").textContent="PLAY ▶ SP 0:00:"+String(Math.floor(t)).padStart(2,"0");
+    // the big crunch: from 18.6 s the whole universe spins and shrinks into the burning heart
+    var crunch=Math.max(0,Math.min(1,(t-18.6)/6)), cpx=cx, cpy=Math.min(H*0.96,cy+R*1.45)-R*0.36*5.2;
+    var ce=crunch*crunch*crunch;
+    if(crunch>0&&!crunchSnd){ crunchSnd=true; if(audio.on) audio.collapse(); }
+    g.save();
+    if(crunch>0){ g.fillStyle="#000"; g.fillRect(0,0,W,H); g.translate(cpx,cpy); g.scale(Math.max(0.001,1-ce),Math.max(0.001,1-ce)); g.translate(-cpx,-cpy); }
+
+    // backdrop: cheap chroma blue, then the universe
+    var u=Math.min(1,Math.max(0,(t-3.2)/1.2));
+    g.fillStyle="#1e3cff"; g.fillRect(0,0,W,H);
+    if(u<1){ g.fillStyle="rgba(255,255,255,.05)"; for(var y=0;y<H;y+=22) g.fillRect(0,y+(T*30%22),W,2); }
+    if(u>0){
+      g.globalAlpha=u; var bg=g.createRadialGradient(cx,cy-R,10,cx,cy-R,Math.max(W,H));
+      bg.addColorStop(0,"#ffe9f6"); bg.addColorStop(.18,"#ff9ad5"); bg.addColorStop(.45,"#7a3fd1"); bg.addColorStop(1,"#14062e");
+      g.fillStyle=bg; g.fillRect(0,0,W,H);
+      // galaxy of tiny stars turning gently around the open head
+      for(var i=0;i<stars.length;i++){ var s=stars[i], rr=s.r*Math.max(W,H)*.7, a=s.a+s.arm*2.09+rr*0.004+T*0.12;
+        g.fillStyle=["#fff","#ffd84a","#bff"][s.arm]; g.fillRect(cx+Math.cos(a)*rr,cy-R+Math.sin(a)*rr*.6,s.s,s.s); }
+      // rainbow rings
+      for(var k=0;k<7;k++){ var rad=(t-3)*R*1.6+k*R*.22; if(rad>0){ g.strokeStyle="hsla("+(k*50)+",95%,65%,"+Math.max(0,.7-rad/Math.max(W,H))+")"; g.lineWidth=R*.12; g.beginPath(); g.arc(cx,cy-R*.3,rad,Math.PI,0); g.stroke(); } }
+      // the sun the doves fly home to
+      var sx=W*0.82, sy=H*0.13, sr=Math.min(W,H)*0.07;
+      // supernova: the sun swells and throbs, then bursts
+      if(t>8&&t<9) sr*=1+(t-8)*2.2+Math.sin(t*40)*0.12*(t-8);
+      if(t>=9&&!novaed){ novaed=true; nova(sx,sy,Math.min(W,H)*0.17); }
+      if(t>=9){ var nt=t-9, M=Math.max(W,H);
+        for(var kk=0;kk<9;kk++){ var rr2=nt*M*0.9-kk*M*0.05; if(rr2>0){ g.strokeStyle="hsla("+(kk*40+T*60)%360+",100%,70%,"+Math.max(0,.8-rr2/(M*1.4))+")"; g.lineWidth=M*0.02; g.beginPath(); g.arc(sx,sy,rr2,0,7); g.stroke(); } }
+        var core=Math.max(0,1-nt/1.6), cg=g.createRadialGradient(sx,sy,0,sx,sy,M*0.5*(0.3+nt));
+        cg.addColorStop(0,"rgba(255,255,255,"+core+")"); cg.addColorStop(.4,"rgba(255,200,240,"+core*.6+")"); cg.addColorStop(1,"rgba(255,200,240,0)");
+        g.fillStyle=cg; g.fillRect(0,0,W,H);
+        sr=sr*Math.max(0,1-nt*1.5); }
+      if(sr>0){
+      var sg=g.createRadialGradient(sx,sy,0,sx,sy,sr*3.2); sg.addColorStop(0,"rgba(255,250,220,.95)"); sg.addColorStop(.3,"rgba(255,220,120,.55)"); sg.addColorStop(1,"rgba(255,180,120,0)");
+      g.fillStyle=sg; g.beginPath(); g.arc(sx,sy,sr*3.2,0,7); g.fill();
+      g.save(); g.translate(sx,sy); g.rotate(T*.15); g.fillStyle="rgba(255,236,160,.35)";
+      for(var ry=0;ry<12;ry++){ g.rotate(Math.PI/6); g.beginPath(); g.moveTo(sr*1.1,-sr*.12); g.lineTo(sr*2.6,0); g.lineTo(sr*1.1,sr*.12); g.fill(); }
+      g.restore(); g.fillStyle=t>8?"hsl("+(50-(t-8)*40)+",100%,"+(85-(t-8)*10)+"%)":"#fff6d0"; g.beginPath(); g.arc(sx,sy,sr,0,7); g.fill();
+      }
+      g.globalAlpha=1;
+    }
+
+    // the head
+    var mood=t<1.6?"serene":t<3?"strain":t<3.2?"wide":"serene";
+    var shake=t>1.6&&t<3.2?R*.08*(t-1.6):0;
+    var scale=t<3?1+t*0.03:1;
+    var open=t>=3.2?Math.min(1,(t-3.2)/.25):0;
+    if(t>=3.2&&!boomed){ boomed=true; boom(cx,cy-R*.2,R); }
+    // light leaking before the burst
+    if(t>2.2&&t<3.2){ g.fillStyle="rgba(255,246,214,"+((t-2.2)*.5)+")"; for(var j=0;j<6;j++){ g.save(); g.translate(cx,cy-R*.6); g.rotate(-Math.PI/2+(j-2.5)*.35+Math.sin(T*20+j)*.05); g.fillRect(0,-2,R*2*(t-2.2),4); g.restore(); } }
+    if(t<9) head(cx,cy,R*scale,mood,open,shake);
+    else {
+      // the supernova blasts the flesh away: an x-ray flash, then just the bones, doing yoga
+      var groundY=Math.min(H*0.96,cy+R*1.45), u=R*0.36;
+      if(t<9.45){ g.save(); g.globalAlpha=1-(t-9)/0.45; head(cx,cy,R,"wide",1,R*.1); g.restore(); }
+      g.fillStyle="#8a4fd1"; g.fillRect(cx-u*3.4,groundY,u*6.8,u*0.28);
+      var POSES=["mountain","tree","warrior","dog","mountain"], hold=1.15, yt=Math.max(0,t-9.6), seg=Math.min(POSES.length-2,Math.floor(yt/hold)), f=yt>0?Math.min(1,(yt-seg*hold)/(hold*0.55)):0;
+      f=f*f*(3-2*f);
+      if(t<14.4) skeleton(cx,groundY,u,POSES[seg],POSES[seg+1],f,t<9.45?1-(t-9)/0.45:0,T);
+      else crumble(cx,groundY,u,t,T);
+      if(t>10.2&&t<14.6) cheap("namaste",cx,groundY-u*8.6,Math.max(22,W*.03),"#ffffff",Math.min(1,(t-10.2)*2)*(t>14?Math.max(0,(14.6-t)/.6):1));
+      if(t>15.6) cheap("burning love",cx,groundY-u*10,Math.max(22,W*.03),"#ffb347",Math.min(1,(t-15.6)*2)*(t>18?Math.max(0,19-t):1));
+    }
+
+    // particles: burst outward, then drift and orbit calmly
+    for(var q=0;q<parts.length;q++){ var p=parts[q];
+      if(p.k==="dove"&&t>4.4){
+        // after the burst the doves turn and fly up into the sky, toward the sun, getting smaller as they go
+        var tx=W*0.82-p.x, ty=H*0.13-p.y, dist=Math.hypot(tx,ty)||1, pull=0.06+Math.min(0.12,(t-4.4)*0.03);
+        p.vx+=tx/dist*pull; p.vy+=ty/dist*pull; p.vx*=0.985; p.vy*=0.985;
+        if(p.s0==null) p.s0=p.s; p.s=Math.max(p.s0*0.15,p.s*0.996);
+        p.a=Math.max(0,Math.min(1,(dist-Math.min(W,H)*0.05)/(Math.min(W,H)*0.25)));
+      } else { p.vx*=0.975; p.vy*=0.975; p.vy-=0.02; }
+      p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+      p.x+=Math.sin(T*.8+p.o)*0.4; if(p.a!==0) drawPart(p,T); }
+
+    // flash
+    if(t>3.2&&t<3.6){ g.fillStyle="rgba(255,255,255,"+(1-(t-3.2)/.4)+")"; g.fillRect(0,0,W,H); }
+    if(t>9&&t<9.6){ g.fillStyle="rgba(255,255,255,"+(1-(t-9)/.6)+")"; g.fillRect(0,0,W,H); }
+
+    // words
+    if(t<1.6) cheap("relax your mind",cx,H*0.16,Math.max(28,W*.045),"#e8ffe8",Math.min(1,t*2));
+    else if(t<3.2) cheap("relax... your... MIND",cx,H*0.16,Math.max(28,W*.05),"#ffef5a",1);
+    else wordArt("PEACE",cx,H*0.2,Math.max(48,Math.min(W*.16,170)),T,Math.min(1,(t-3.3)*1.5));
+    if(t>6.5&&t<9) cheap("ahhhhhhhhh",cx,H*0.34,Math.max(24,W*.035),"#ffffff",Math.min(1,(t-6.5))*(t>8.4?Math.max(0,(9-t)/.6):1));
+    if(t>9.4) cheap("SUPERNOVA OF PEACE",cx,H*0.34,Math.max(26,W*.04),"#ffef5a",Math.min(1,(t-9.4)*2)*(t>18?Math.max(0,(19-t)):1));
+
+    // rewind static at the end of the loop
+    g.restore();
+    if(crunch>0){
+      // The big bang in reverse, slowly: light and matter stream inward and the rainbow rings close in (18.6 to about 21 s),
+      // then a black hole forms with an event horizon, a photon ring and a swirling accretion disk (about 21 to 23.4 s),
+      // then everything, horizon and all, shrinks to a single point (to 24.6 s), which trembles and goes out (25.4 s).
+      var M=Math.max(W,H), m=Math.min(W,H);
+      g.fillStyle="rgba(0,0,0,"+Math.min(1,ce*1.4+crunch*0.3)+")"; g.fillRect(0,0,W,H);
+      var hole=Math.max(0,Math.min(1,(crunch-0.4)/0.15)), shrink=Math.max(0,Math.min(1,(crunch-0.8)/0.2)), sk=1-shrink*shrink;
+      var RH=m*0.11*hole*sk;
+      g.save(); g.globalCompositeOperation="lighter";
+      // infalling streaks, spiralling more as the hole forms
+      for(var st=0;st<Math.floor(40+crunch*220);st++){ var ph=((T*1.2+st*0.37)%1), base=(st*2.399)%(Math.PI*2), sw=hole*(1-ph)*2.2;
+        var r0=Math.max(RH,(M*(1-ph))*sk*(1-ce*0.5)), r1=Math.max(RH,r0*(0.8-ph*0.3)), a0=base+sw, a1=base+sw+hole*0.25;
+        g.strokeStyle="hsla("+((st*37)%360)+",100%,75%,"+(0.12+crunch*0.45)*ph*sk+")"; g.lineWidth=1+crunch*2;
+        g.beginPath(); g.moveTo(cpx+Math.cos(a0)*r0,cpy+Math.sin(a0)*r0); g.lineTo(cpx+Math.cos(a1)*r1,cpy+Math.sin(a1)*r1); g.stroke(); }
+      // rainbow rings closing in
+      var rc=Math.min(1,crunch/0.45);
+      for(var rk=0;rk<7;rk++){ var rr3=M*(1-rc)*(1.1-rk*0.12); if(rr3>2){ g.strokeStyle="hsla("+(rk*50)+",95%,65%,"+(0.55*Math.min(1,crunch*4))+")"; g.lineWidth=Math.max(2,M*0.015*(1-rc)); g.beginPath(); g.arc(cpx,cpy,rr3,0,7); g.stroke(); } }
+      // the glare grows as matter falls in, until the hole swallows it
+      var glare=m*(0.04+Math.min(crunch,0.4)*0.6)*(1-hole*0.5)*sk;
+      if(glare>1){ var pg=g.createRadialGradient(cpx,cpy,0,cpx,cpy,glare*3); pg.addColorStop(0,"rgba(255,255,255,"+(1-hole*0.7)+")"); pg.addColorStop(.25,"rgba(255,230,200,"+(.8-hole*0.4)+")"); pg.addColorStop(1,"rgba(255,160,200,0)");
+        g.fillStyle=pg; g.beginPath(); g.arc(cpx,cpy,glare*3,0,7); g.fill(); }
+      if(hole>0&&RH>0.5){
+        // accretion disk: a tilted, turning ring of hot gas, brighter on the side coming toward us
+        g.save(); g.translate(cpx,cpy);
+        for(var dk=0;dk<140;dk++){ var da=dk/140*Math.PI*2+T*1.8, dr=RH*(1.6+((dk*53)%17)/17*1.6), dx=Math.cos(da)*dr, dy=Math.sin(da)*dr*0.28, dop=0.55+0.45*Math.cos(da);
+          var dg=g.createRadialGradient(dx,dy,0,dx,dy,RH*0.35); dg.addColorStop(0,"hsla("+(25+dop*20)+",100%,"+(55+dop*25)+"%,"+(0.35*hole*dop)+")"); dg.addColorStop(1,"hsla(20,100%,50%,0)");
+          g.fillStyle=dg; g.beginPath(); g.arc(dx,dy,RH*0.35,0,7); g.fill(); }
+        // light bent over the top of the hole (the far side of the disk, lensed)
+        g.strokeStyle="rgba(255,190,120,"+(0.5*hole)+")"; g.lineWidth=RH*0.18; g.beginPath(); g.ellipse(0,-RH*0.05,RH*1.35,RH*1.15,0,Math.PI*1.05,Math.PI*1.95); g.stroke();
+        g.restore();
+      }
+      g.restore();
+      if(hole>0&&RH>0.5){
+        // the event horizon: perfectly black, rimmed by a thin photon ring
+        g.fillStyle="#000"; g.beginPath(); g.arc(cpx,cpy,RH,0,7); g.fill();
+        g.save(); g.globalCompositeOperation="lighter"; g.strokeStyle="rgba(255,240,210,"+(0.9*hole)+")"; g.lineWidth=Math.max(1.2,RH*0.06); g.shadowColor="#ffcf8a"; g.shadowBlur=RH*0.5;
+        g.beginPath(); g.arc(cpx,cpy,RH*1.04,0,7); g.stroke(); g.restore();
+        // the near side of the disk passes in front of the horizon
+        g.save(); g.globalCompositeOperation="lighter"; g.translate(cpx,cpy);
+        g.strokeStyle="rgba(255,200,140,"+(0.6*hole)+")"; g.lineWidth=RH*0.22; g.beginPath(); g.ellipse(0,0,RH*2.2,RH*0.55,0,0.05,Math.PI-0.05); g.stroke(); g.restore();
+        if(crunch<0.8) cheap("EVENT HORIZON",cpx,cpy+RH*2.6,Math.max(20,W*.025),"#ffd9a8",Math.min(1,hole)*(1-Math.max(0,(crunch-0.72)/0.08)));
+      }
+      // the last point of light
+      if(crunch>=0.97&&t<25.4){ var pr2=1.5+Math.abs(Math.sin(T*30))*1.5, pp=g.createRadialGradient(cpx,cpy,0,cpx,cpy,pr2*8); pp.addColorStop(0,"#fff"); pp.addColorStop(1,"rgba(255,255,255,0)");
+        g.fillStyle=pp; g.beginPath(); g.arc(cpx,cpy,pr2*8,0,7); g.fill(); g.fillStyle="#fff"; g.beginPath(); g.arc(cpx,cpy,pr2,0,7); g.fill(); }
+      if(t>=25.4){ g.fillStyle="#000"; g.fillRect(0,0,W,H); }
+    }
+    if(t>18.4&&t<18.7&&!reduce){ for(var n=0;n<120;n++){ g.fillStyle="rgba(255,255,255,"+Math.random()*.5+")"; g.fillRect(Math.random()*W,Math.random()*H,Math.random()*80,2); } }
+    if(!reduce) requestAnimationFrame(frame);
+  }
+
+  // --- sound: a soft synth "ahh" on the burst, only if asked for ---
+  var audio={on:false,ctx:null,ahh:function(){ var a=this.ctx; if(!a) return; var now=a.currentTime, m=a.createGain(); m.gain.setValueAtTime(0,now); m.gain.linearRampToValueAtTime(.35,now+.4); m.gain.linearRampToValueAtTime(0,now+6); m.connect(a.destination);
+    [261.6,329.6,392,523.3,659.3].forEach(function(f,i){ var o=a.createOscillator(); o.type=i%2?"triangle":"sine"; o.frequency.value=f; var v=a.createOscillator(), vg=a.createGain(); v.frequency.value=5+i*.3; vg.gain.value=3; v.connect(vg); vg.connect(o.frequency); v.start(now); o.connect(m); o.start(now); o.stop(now+6.2); v.stop(now+6.2); });
+    var n=a.createBufferSource(), b=a.createBuffer(1,a.sampleRate*.8,a.sampleRate), d=b.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,2);
+    var ng=a.createGain(); ng.gain.value=.25; n.buffer=b; n.connect(ng); ng.connect(a.destination); n.start(now); }};
+  // Bones crumbling: a clatter of dry clicks and knocks that bounce and settle.
+  audio.crumble=function(){ var a=this.ctx; if(!a) return; var now=a.currentTime;
+    for(var i=0;i<70;i++){ var at=now+Math.pow(Math.random(),1.6)*1.4, o=a.createOscillator(), gn=a.createGain(), bp=a.createBiquadFilter();
+      o.type="square"; o.frequency.value=600+Math.random()*1800; bp.type="bandpass"; bp.frequency.value=900+Math.random()*2500; bp.Q.value=6;
+      gn.gain.setValueAtTime(0,at); gn.gain.linearRampToValueAtTime(.18*(1-(at-now)/1.6),at+.004); gn.gain.exponentialRampToValueAtTime(.0005,at+.05+Math.random()*.06);
+      o.connect(bp); bp.connect(gn); gn.connect(a.destination); o.start(at); o.stop(at+.13); }
+    var thud=a.createOscillator(), tg=a.createGain(); thud.frequency.setValueAtTime(140,now+.15); thud.frequency.exponentialRampToValueAtTime(50,now+.5); tg.gain.setValueAtTime(.4,now+.15); tg.gain.exponentialRampToValueAtTime(.001,now+.6); thud.connect(tg); tg.connect(a.destination); thud.start(now+.15); thud.stop(now+.65); };
+  // Collapsing to a point: a reversed whoosh that swells as everything falls in, a drone sinking into a sub-bass rumble at the
+  // event horizon, a rising shimmer squeezed higher and higher, then one tiny ping and silence.
+  audio.collapse=function(){ var a=this.ctx; if(!a) return; var now=a.currentTime, D=6;
+    if(this.bedNode){ this.bedNode.gain.setTargetAtTime(0,now,1.5); var bn=this.bedNode; setTimeout(function(){ if(bn) bn.gain.setTargetAtTime(1,a.currentTime,.5); },(D+2)*1000); }
+    var len=a.sampleRate*D, b=a.createBuffer(1,len,a.sampleRate), d=b.getChannelData(0); for(var i=0;i<len;i++) d[i]=Math.random()*2-1;
+    var src=a.createBufferSource(), bp=a.createBiquadFilter(), wg=a.createGain(); src.buffer=b; bp.type="bandpass"; bp.Q.value=1.2;
+    bp.frequency.setValueAtTime(200,now); bp.frequency.exponentialRampToValueAtTime(3500,now+D*.95);
+    wg.gain.setValueAtTime(.001,now); wg.gain.exponentialRampToValueAtTime(.5,now+D*.93); wg.gain.linearRampToValueAtTime(0,now+D);
+    src.connect(bp); bp.connect(wg); wg.connect(a.destination); src.start(now); src.stop(now+D);
+    var dr=a.createOscillator(), dg=a.createGain(); dr.type="sawtooth"; dr.frequency.setValueAtTime(110,now); dr.frequency.exponentialRampToValueAtTime(30,now+D*.8);
+    var lp=a.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=400; dg.gain.setValueAtTime(0,now); dg.gain.linearRampToValueAtTime(.35,now+D*.45); dg.gain.linearRampToValueAtTime(.5,now+D*.75); dg.gain.linearRampToValueAtTime(0,now+D*.97);
+    dr.connect(lp); lp.connect(dg); dg.connect(a.destination); dr.start(now); dr.stop(now+D);
+    var sh=a.createOscillator(), sg=a.createGain(); sh.type="sine"; sh.frequency.setValueAtTime(400,now); sh.frequency.exponentialRampToValueAtTime(6000,now+D*.97);
+    sg.gain.setValueAtTime(0,now); sg.gain.linearRampToValueAtTime(.08,now+D*.6); sg.gain.linearRampToValueAtTime(0,now+D*.98); sh.connect(sg); sg.connect(a.destination); sh.start(now); sh.stop(now+D);
+    var pg=a.createOscillator(), pgg=a.createGain(); pg.type="sine"; pg.frequency.value=2093; pgg.gain.setValueAtTime(0,now+D); pgg.gain.linearRampToValueAtTime(.2,now+D+.01); pgg.gain.exponentialRampToValueAtTime(.0005,now+D+.9);
+    pg.connect(pgg); pgg.connect(a.destination); pg.start(now+D); pg.stop(now+D+1); };
+  audio.fire=function(){ var a=this.ctx; if(!a) return; var now=a.currentTime, len=a.sampleRate*3.4, b=a.createBuffer(1,len,a.sampleRate), d=b.getChannelData(0);
+    for(var i=0;i<len;i++){ var e=Math.min(1,i/(a.sampleRate*.3))*Math.min(1,(len-i)/(a.sampleRate*.6)); d[i]=((Math.random()*2-1)*.25+(Math.random()<.0015?(Math.random()*2-1):0))*e; }
+    var src=a.createBufferSource(), lp=a.createBiquadFilter(), gn=a.createGain(); lp.type="lowpass"; lp.frequency.value=2200; gn.gain.value=.6; src.buffer=b; src.connect(lp); lp.connect(gn); gn.connect(a.destination); src.start(now); };
+  audio.nova=function(){ var a=this.ctx; if(!a) return; var now=a.currentTime;
+    var o=a.createOscillator(), og=a.createGain(); o.type="sine"; o.frequency.setValueAtTime(90,now); o.frequency.exponentialRampToValueAtTime(28,now+2.5); og.gain.setValueAtTime(.6,now); og.gain.exponentialRampToValueAtTime(.001,now+3); o.connect(og); og.connect(a.destination); o.start(now); o.stop(now+3.1);
+    var m=a.createGain(); m.gain.setValueAtTime(0,now); m.gain.linearRampToValueAtTime(.25,now+.2); m.gain.linearRampToValueAtTime(0,now+4.5); m.connect(a.destination);
+    [523.3,659.3,784,1046.5,1318.5].forEach(function(f,i){ var s=a.createOscillator(); s.type="triangle"; s.frequency.value=f; s.detune.value=(i-2)*8; s.connect(m); s.start(now+i*.06); s.stop(now+4.6); }); };
+  // A quiet tape bed (hiss and a low organ drone) while sound is on, so it is never silent between bursts.
+  audio.bed=function(on){ var a=this.ctx; if(!a) return;
+    if(on&&!this.bedNode){ var m=a.createGain(); m.gain.value=0; m.connect(a.destination);
+      var b=a.createBuffer(1,a.sampleRate*2,a.sampleRate), d=b.getChannelData(0); for(var i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*.5;
+      var hiss=a.createBufferSource(); hiss.buffer=b; hiss.loop=true; var hf=a.createBiquadFilter(); hf.type="highpass"; hf.frequency.value=3000; var hg=a.createGain(); hg.gain.value=.05; hiss.connect(hf); hf.connect(hg); hg.connect(m); hiss.start();
+      [130.8,196].forEach(function(f){ var o=a.createOscillator(); o.type="sine"; o.frequency.value=f; var og=a.createGain(); og.gain.value=.06; o.connect(og); og.connect(m); o.start(); });
+      m.gain.linearRampToValueAtTime(1,a.currentTime+.5); this.bedNode=m; }
+    else if(!on&&this.bedNode){ var n=this.bedNode; n.gain.linearRampToValueAtTime(0,a.currentTime+.3); setTimeout(function(){n.disconnect();},400); this.bedNode=null; } };
+  var snd=document.getElementById("snd");
+  snd.addEventListener("click",function(){ if(!audio.ctx){ var AC=window.AudioContext||window.webkitAudioContext; if(!AC){snd.textContent="NO SOUND";return;} audio.ctx=new AC(); }
+    if(audio.ctx.state==="suspended") audio.ctx.resume();
+    audio.on=!audio.on; snd.setAttribute("aria-pressed",String(audio.on)); snd.textContent=audio.on?"SOUND ON":"SOUND OFF";
+    if(audio.on){ audio.bed(true); t0=performance.now(); lastLoop=-1; } else audio.bed(false); });
+  // Opened from the game's collection: sound is on from the start (and on the first click, if the browser held it back).
+  if(/[?&]autoplay=1/.test(location.search)){ snd.click(); document.addEventListener("pointerdown",function(){ if(audio.ctx&&audio.ctx.state==="suspended") audio.ctx.resume(); },{once:true}); }
+  document.getElementById("again").addEventListener("click",function(){ t0=performance.now(); lastLoop=-1; if(reduce){ reduce=false; requestAnimationFrame(frame); setTimeout(function(){reduce=true;},LOOP*1000); } });
+
+  if(reduce){ boom(W/2,H*0.62-Math.min(W,H)*0.034,Math.min(W,H)*0.17); for(var s=0;s<60;s++) parts.forEach(function(p){p.x+=p.vx;p.y+=p.vy;p.vx*=.975;p.vy*=.975;}); lastLoop=0; boomed=true; novaed=true; frame(t0); }
+  else requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
